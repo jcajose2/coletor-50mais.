@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coletor 50+ Nuvem</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="tela-login">
+        <h2>Acesso 50+ Saúde</h2>
+        <form id="form-login">
+            <input type="email" id="email" class="input-login" placeholder="E-mail" required>
+            <input type="password" id="senha" class="input-login" placeholder="Senha" required>
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
+        <p id="erro-login" style="color: red; margin-top: 10px; font-size: 14px; display: none;">Login ou senha incorretos!</p>
+    </div>
+
+    <div id="tela-pastas" class="oculto">
+        <header>
+            <div class="boas-vindas">Organização de <span>Lotes</span> 📦</div>
+            <button id="btn-sair" class="btn-sair">Sair</button>
+        </header>
+
+        <div class="acoes-topo">
+            <button id="btn-abrir-modal" class="btn-principal">+ Criar Nova Pasta</button>
+        </div>
+
+        <h3 class="titulo-secao">📂 Pastas Abertas</h3>
+        <div class="grid-itens" id="lista-pastas">
+            </div>
+    </div>
+
+    <div id="tela-bipagem" class="oculto">
+        <header style="align-items: flex-start;">
+            <div style="display: flex; gap: 10px;">
+                <button id="btn-voltar" class="btn-secundario">⬅ Voltar</button>
+                <button id="btn-exportar" class="btn-principal" style="background-color: #10b981;">📄 Exportar (.TXT)</button>
+            </div>
+            <div class="info-pasta-header" style="text-align: right;">
+                <h2 id="titulo-pasta-atual" style="color: #2e3192; margin-bottom: 5px;">Nome da Pasta</h2>
+                <p id="info-pasta-atual" style="color: #666; font-size: 14px;">Notas: ... | Conferente: ...</p>
+            </div>
+        </header>
+
+        <div class="progresso-container">
+            <h3 style="text-align: center; color: #4CAF50; margin-bottom: 10px;">
+                Volumes Bipados: <span id="contador-volumes">0</span> de <span id="total-volumes">0</span>
+            </h3>
+        </div>
+
+        <div class="area-leitor">
+            <form id="form-coletor">
+                <input type="text" id="input-codigo" placeholder="Passe o leitor aqui..." autocomplete="off">
+                <div class="status">🟢 Gravando na pasta atual</div>
+            </form>
+        </div>
+
+        <h3 class="titulo-secao">Itens desta pasta (Ordem de leitura)</h3>
+        <div class="grid-itens" id="lista-itens">
+            </div>
+    </div>
+
+    <div id="modal-nova-pasta" class="modal oculto">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px; color: #2e3192;">Criar Nova Pasta</h3>
+            <form id="form-nova-pasta">
+                <label>Nome da Pasta (ex: Carga Sul):</label>
+                <input type="text" id="pasta-nome" class="input-modal" required>
+
+                <label>Responsável / Conferente:</label>
+                <input type="text" id="pasta-usuario" class="input-modal" placeholder="Quem está bipando?" required>
+
+                <label>Qtd. Total de Volumes esperados:</label>
+                <input type="number" id="pasta-volumes" class="input-modal" required min="1">
+
+                <label>Notas Fiscais:</label>
+                <div id="container-nfs">
+                    <input type="text" class="input-modal nf-input" placeholder="Nº da Nota Fiscal" required>
+                </div>
+                <button type="button" id="btn-add-nf" class="btn-secundario" style="margin-bottom: 20px; width: 100%;">+ Adicionar mais uma Nota</button>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" id="btn-fechar-modal" class="btn-secundario" style="flex: 1;">Cancelar</button>
+                    <button type="submit" class="btn-principal" style="flex: 1;">Criar Pasta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-alerta" class="modal oculto" style="z-index: 9999;">
+        <div class="modal-content" style="text-align: center; max-width: 400px;">
+            <div id="alerta-icone" style="font-size: 60px; margin-bottom: 10px;">⚠️</div>
+            <h2 id="alerta-titulo" style="margin-bottom: 15px; font-size: 24px;">Atenção!</h2>
+            <p id="alerta-mensagem" style="color: #555; font-size: 16px; margin-bottom: 25px; line-height: 1.5;"></p>
+            <button id="btn-fechar-alerta" class="btn-principal" style="width: 100%; font-size: 18px;">Ciente, Continuar</button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
