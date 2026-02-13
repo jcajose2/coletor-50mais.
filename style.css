@@ -62,3 +62,20 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 
 .btn-apagar { background: #fee2e2; color: #ef4444; border: none; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
 .btn-apagar:hover { background: #ef4444; color: white; }
+/* =========================================
+   Cores de Alerta para Validade (GS1)
+========================================= */
+
+/* PRODUTO VENCIDO (Vermelho) */
+.card-vencido {
+    border-left: 6px solid #dc3545 !important;
+    background-color: #fff5f5 !important;
+}
+.card-vencido .codigo { color: #dc3545 !important; }
+
+/* VENCE ESTE ANO (Laranja) */
+.card-vence-ano {
+    border-left: 6px solid #f59e0b !important;
+    background-color: #fffbeb !important;
+}
+.card-vence-ano .codigo { color: #d97706 !important; }
