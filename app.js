@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 // --- SUA CONFIGURAÇÃO ---
@@ -20,6 +20,7 @@ const auth = getAuth(app);
 let pastaAtualId = null; 
 let nomePastaAtual = ""; 
 let totalVolumesPastaAtual = 0;
+let statusPastaAtual = "aberta"; // NOVO: Guarda o status da pasta aberta
 let bipagensAtuais = []; 
 let unsubscribeBipagens = null;
 
@@ -28,24 +29,23 @@ const telaLogin = document.getElementById('tela-login');
 const telaPastas = document.getElementById('tela-pastas');
 const telaBipagem = document.getElementById('tela-bipagem');
 const modalNovaPasta = document.getElementById('modal-nova-pasta');
-
-// --- SISTEMA DE ALERTA BONITÃO ---
 const modalAlerta = document.getElementById('modal-alerta');
 const iconeAlerta = document.getElementById('alerta-icone');
 const tituloAlerta = document.getElementById('alerta-titulo');
 const mensagemAlerta = document.getElementById('alerta-mensagem');
 
+// --- SISTEMA DE ALERTA BONITÃO ---
 function mostrarAlerta(titulo, mensagem, tipo) {
     tituloAlerta.innerText = titulo;
     mensagemAlerta.innerHTML = mensagem; 
     
     if (tipo === 'erro') {
         iconeAlerta.innerText = '❌';
-        tituloAlerta.style.color = '#ef4444'; // Vermelho
-        document.getElementById('btn-fechar-alerta').style.backgroundColor = '#ef4444';
+        tituloAlerta.style.color = '#e53e3e'; 
+        document.getElementById('btn-fechar-alerta').style.backgroundColor = '#e53e3e';
     } else {
         iconeAlerta.innerText = '⚠️';
-        tituloAlerta.style.color = '#d97706'; // Laranja
+        tituloAlerta.style.color = '#d97706'; 
         document.getElementById('btn-fechar-alerta').style.backgroundColor = '#d97706';
     }
     modalAlerta.classList.remove('oculto');
@@ -53,7 +53,10 @@ function mostrarAlerta(titulo, mensagem, tipo) {
 
 document.getElementById('btn-fechar-alerta').addEventListener('click', () => {
     modalAlerta.classList.add('oculto');
-    document.getElementById('input-codigo').focus();
+    // Só foca no input se a pasta estiver aberta
+    if(statusPastaAtual === "aberta") {
+        document.getElementById('input-codigo').focus();
+    }
 });
 
 
@@ -109,7 +112,8 @@ document.getElementById('form-nova-pasta').addEventListener('submit', async (e) 
             volumesTotal: parseInt(volumes),
             notasFiscais: notasFiscais,
             dataCriacao: new Date().toLocaleDateString('pt-BR'),
-            timestamp: new Date().getTime()
+            timestamp: new Date().getTime(),
+            status: 'aberta' // NOVO: Toda pasta nasce aberta
         });
         document.getElementById('form-nova-pasta').reset();
         document.getElementById('container-nfs').innerHTML = '<input type="text" class="input-modal nf-input" placeholder="Nº da Nota Fiscal" required>';
@@ -119,20 +123,30 @@ document.getElementById('form-nova-pasta').addEventListener('submit', async (e) 
     }
 });
 
-// --- RENDERIZAR PASTAS ---
+// --- RENDERIZAR PASTAS (SEPARANDO ABERTAS DE FINALIZADAS) ---
 onSnapshot(query(collection(db, 'pastas'), orderBy('timestamp', 'desc')), (snapshot) => {
-    const lista = document.getElementById('lista-pastas');
-    lista.innerHTML = ''; 
+    const listaAbertas = document.getElementById('lista-pastas');
+    const listaFinalizadas = document.getElementById('lista-pastas-finalizadas');
+    
+    listaAbertas.innerHTML = ''; 
+    listaFinalizadas.innerHTML = ''; 
+
     snapshot.forEach((documento) => {
         const pasta = documento.data();
         const id = documento.id;
+        // Tratamento para pastas antigas que não tinham status
+        const statusReal = pasta.status ? pasta.status : 'aberta'; 
+        
         const card = document.createElement('div');
-        card.className = 'card-item card-pasta';
+        // Muda a cor do cartão dependendo do status
+        card.className = `card-item ${statusReal === 'finalizada' ? 'card-finalizada' : 'card-pasta'}`;
+        
         const nfsText = pasta.notasFiscais.join(', ');
+        const iconeStatus = statusReal === 'finalizada' ? '🔒' : '📁';
 
         card.innerHTML = `
             <div class="info-card" style="flex: 1;">
-                <span class="codigo">📁 ${pasta.nome}</span>
+                <span class="codigo">${iconeStatus} ${pasta.nome}</span>
                 <span class="data">NF(s): ${nfsText}</span>
                 <span class="data">Conferente: <span class="destaque">${pasta.usuario}</span></span>
                 <span class="data">Data: ${pasta.dataCriacao} | Volumes: ${pasta.volumesTotal}</span>
@@ -146,28 +160,53 @@ onSnapshot(query(collection(db, 'pastas'), orderBy('timestamp', 'desc')), (snaps
                     await deleteDoc(doc(db, 'pastas', id));
                 }
             } else {
-                abrirPasta(id, pasta.nome, nfsText, pasta.usuario, pasta.volumesTotal);
+                abrirPasta(id, pasta.nome, nfsText, pasta.usuario, pasta.volumesTotal, statusReal);
             }
         });
 
-        lista.appendChild(card);
+        // Joga para a lista certa na tela
+        if (statusReal === 'finalizada') {
+            listaFinalizadas.appendChild(card);
+        } else {
+            listaAbertas.appendChild(card);
+        }
     });
 });
 
 // --- ABRIR UMA PASTA ---
-function abrirPasta(id, nome, nfs, usuario, volumesTotal) {
+function abrirPasta(id, nome, nfs, usuario, volumesTotal, status) {
     pastaAtualId = id;
     nomePastaAtual = nome;
     totalVolumesPastaAtual = volumesTotal;
+    statusPastaAtual = status;
 
     telaPastas.classList.add('oculto');
     telaBipagem.classList.remove('oculto');
     
-    document.getElementById('titulo-pasta-atual').innerText = "📁 " + nome;
+    const iconeCabecalho = status === 'finalizada' ? '🔒' : '📁';
+    document.getElementById('titulo-pasta-atual').innerText = `${iconeCabecalho} ${nome}`;
     document.getElementById('info-pasta-atual').innerText = `Notas: ${nfs} | Conferente: ${usuario}`;
     document.getElementById('total-volumes').innerText = volumesTotal;
     
-    setTimeout(() => document.getElementById('input-codigo').focus(), 100);
+    // NOVO: Controle de Bloqueio da Interface
+    const inputCodigo = document.getElementById('input-codigo');
+    const btnFinalizar = document.getElementById('btn-finalizar');
+    const statusTexto = document.querySelector('.status');
+
+    if (status === 'finalizada') {
+        inputCodigo.disabled = true;
+        inputCodigo.placeholder = "PASTA FINALIZADA. LEITURA BLOQUEADA.";
+        btnFinalizar.style.display = 'none'; // Esconde o botão de finalizar
+        statusTexto.innerText = "🔒 Esta carga já foi conferida e fechada.";
+        statusTexto.style.color = "#e53e3e";
+    } else {
+        inputCodigo.disabled = false;
+        inputCodigo.placeholder = "Passe o leitor de código de barras aqui...";
+        btnFinalizar.style.display = 'inline-block'; // Mostra o botão
+        statusTexto.innerText = "🟢 Sistema ativo e gravando em tempo real";
+        statusTexto.style.color = "#718096";
+        setTimeout(() => inputCodigo.focus(), 100);
+    }
 
     if (unsubscribeBipagens) unsubscribeBipagens();
 
@@ -184,8 +223,8 @@ function abrirPasta(id, nome, nfs, usuario, volumesTotal) {
             document.querySelector('.progresso-container').style.backgroundColor = '#d1e7dd';
             document.querySelector('.progresso-container').style.borderColor = '#badbcc';
         } else {
-            document.querySelector('.progresso-container').style.backgroundColor = '#fff3cd';
-            document.querySelector('.progresso-container').style.borderColor = '#ffecb5';
+            document.querySelector('.progresso-container').style.backgroundColor = '#f0fdf4';
+            document.querySelector('.progresso-container').style.borderColor = '#bbf7d0';
         }
 
         snapshot.forEach((docBip) => {
@@ -207,17 +246,35 @@ function abrirPasta(id, nome, nfs, usuario, volumesTotal) {
             const card = document.createElement('div');
             card.className = `card-item card-bipagem ${classeCorCSS}`; 
             
+            // Se estiver finalizada, removemos o botão de apagar o item individual também!
+            const botaoApagar = status === 'finalizada' ? '' : `<button class="btn-apagar" onclick="apagarBipagem('${idBip}')">X</button>`;
+
             card.innerHTML = `
                 <div class="info-card" style="flex: 1;">
                     <span class="codigo">${iconeStatus} ${item.fullCode}</span>
                     <span class="data">⏰ Lançado às: ${item.hora}</span>
                 </div>
-                <button class="btn-apagar" onclick="apagarBipagem('${idBip}')">X</button>
+                ${botaoApagar}
             `;
             listaBipagens.appendChild(card);
         });
     });
 }
+
+// --- NOVO: FUNÇÃO DE FINALIZAR PASTA ---
+document.getElementById('btn-finalizar').addEventListener('click', async () => {
+    if(confirm(`🔒 ATENÇÃO!\nTem certeza que deseja FINALIZAR a carga "${nomePastaAtual}"?\n\nApós finalizada, o leitor será bloqueado e não será possível adicionar nem remover itens desta pasta.`)) {
+        try {
+            await updateDoc(doc(db, 'pastas', pastaAtualId), {
+                status: 'finalizada'
+            });
+            // Quando terminar de atualizar, volta sozinho pra tela inicial
+            document.getElementById('btn-voltar').click();
+        } catch (erro) {
+            mostrarAlerta("Erro", "Não foi possível finalizar a pasta. Verifique a internet.", "erro");
+        }
+    }
+});
 
 // --- FUNÇÃO DE EXPORTAR (.TXT) ---
 document.getElementById('btn-exportar').addEventListener('click', () => {
@@ -238,6 +295,7 @@ document.getElementById('btn-exportar').addEventListener('click', () => {
 // --- VOLTAR PARA DASHBOARD ---
 document.getElementById('btn-voltar').addEventListener('click', () => {
     pastaAtualId = null;
+    statusPastaAtual = "aberta";
     telaBipagem.classList.add('oculto');
     telaPastas.classList.remove('oculto');
 });
@@ -248,42 +306,29 @@ document.getElementById('form-coletor').addEventListener('submit', async (e) => 
     const inputCodigo = document.getElementById('input-codigo');
     const codigoLimpo = inputCodigo.value.trim();
     
-    if (codigoLimpo === '' || !pastaAtualId) return;
+    // Impede de bipar se a pasta estiver finalizada ou vazia
+    if (codigoLimpo === '' || !pastaAtualId || statusPastaAtual === 'finalizada') return;
 
-    // =========================================================
-    // 🚫 0. BLOQUEIO DE QR CODE DE SITE (URL)
-    // =========================================================
+    // 0. BLOQUEIO DE QR CODE DE SITE
     const textoMinusculo = codigoLimpo.toLowerCase();
     if (textoMinusculo.includes('http://') || textoMinusculo.includes('https://') || textoMinusculo.includes('www.')) {
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]); 
-        mostrarAlerta(
-            "QR Code Inválido!",
-            "Você bipou um <b>QR Code de site</b> em vez do código de barras do produto.<br><br><b>Procure o código de barras longo (GS1).</b>",
-            "erro"
-        );
+        mostrarAlerta("QR Code Inválido!", "Você bipou um <b>QR Code de site</b> em vez do código de barras.<br><br>Procure o código longo (GS1).", "erro");
         inputCodigo.value = ''; 
-        return; // 🛑 Bloqueia o salvamento
+        return; 
     }
 
-    // =========================================================
-    // 🚫 1. BLOQUEIO DE CÓDIGO ERRADO (EAN DE CAIXA MENOR)
-    // =========================================================
+    // 1. BLOQUEIO DE CÓDIGO ERRADO (EAN)
     if (codigoLimpo.length <= 14) {
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]); 
-        mostrarAlerta(
-            "Código Incorreto!", 
-            "Você bipou o código menor da embalagem (EAN).<br><br><b>Bipe o código maior que contém lote e validade.</b>", 
-            "erro"
-        );
+        mostrarAlerta("Código Incorreto!", "Você bipou o código menor da embalagem (EAN).<br><br>Bipe o código maior que contém lote e validade.", "erro");
         inputCodigo.value = ''; 
         return; 
     }
 
     let statusDaBipagem = 'ok';
 
-    // =========================================================
-    // ⚠️ 2. LEITURA DE DATA GS1-128 (Validade e Vencimento)
-    // =========================================================
+    // 2. LEITURA DE DATA GS1-128
     if (codigoLimpo.startsWith("01") && codigoLimpo.length >= 24) {
         const identificadorData = codigoLimpo.substring(16, 18);
         
@@ -300,32 +345,20 @@ document.getElementById('form-coletor').addEventListener('submit', async (e) => 
             const diaAtual = String(hoje.getDate()).padStart(2, '0');
             const dataHojeStr = anoAtual + mesAtual + diaAtual;
             
-            // Já passou da data? (Vencido)
             if (dataCodigoStr < dataHojeStr) {
                 if (navigator.vibrate) navigator.vibrate([800, 300, 800, 300, 800]); 
-                mostrarAlerta(
-                    "🚨 PRODUTO VENCIDO! 🚨",
-                    `A validade desta caixa expirou no dia <b>${diaVencimento}/${mesVencimento}/20${anoVencimento}</b>!<br><br><b>O código ficará marcado em VERMELHO. Separe este produto imediatamente!</b>`,
-                    "erro"
-                );
+                mostrarAlerta("🚨 PRODUTO VENCIDO! 🚨", `A validade desta caixa expirou no dia <b>${diaVencimento}/${mesVencimento}/20${anoVencimento}</b>!<br><br><b>Separe este produto imediatamente!</b>`, "erro");
                 statusDaBipagem = 'vencido';
             } 
-            // Vence este ano? (Atenção)
             else if (anoVencimento === anoAtual) {
                 if (navigator.vibrate) navigator.vibrate([500, 200, 500]); 
-                mostrarAlerta(
-                    "⚠️ Cuidado com a Validade!",
-                    `Este produto VENCE NESTE ANO (<b>${diaVencimento}/${mesVencimento}/20${anoVencimento}</b>)!<br><br>O código ficará marcado em <b>Laranja</b> para conferência.`,
-                    "aviso"
-                );
+                mostrarAlerta("⚠️ Cuidado com a Validade!", `Este produto VENCE NESTE ANO (<b>${diaVencimento}/${mesVencimento}/20${anoVencimento}</b>)!<br><br>O código ficará marcado em Laranja.`, "aviso");
                 statusDaBipagem = 'vence_este_ano';
             }
         }
     }
 
-    // =========================================================
-    // ✅ 3. SALVAR NO BANCO DE DADOS
-    // =========================================================
+    // 3. SALVAR NO BANCO
     try {
         await addDoc(collection(db, 'pastas', pastaAtualId, 'bipagens'), {
             fullCode: codigoLimpo,
@@ -347,10 +380,12 @@ window.apagarBipagem = async (idBipagem) => {
     }
 };
 
+// Manter foco no leitor
 setInterval(() => {
     if (!telaBipagem.classList.contains('oculto') && 
         modalNovaPasta.classList.contains('oculto') &&
-        modalAlerta.classList.contains('oculto')) {
+        modalAlerta.classList.contains('oculto') && 
+        statusPastaAtual === "aberta") { // Só rouba o foco se a pasta estiver aberta!
         
         const inputCodigo = document.getElementById('input-codigo');
         if(document.activeElement !== inputCodigo) inputCodigo.focus();

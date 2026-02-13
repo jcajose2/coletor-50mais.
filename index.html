@@ -12,7 +12,6 @@
         <div class="login-imagem">
             <img src="imagens/logo-login.png" alt="Ilustração de Logística 50+">
         </div>
-
         <div class="login-form">
             <h2>Acesso 50+ Saúde</h2>
             <p style="margin-bottom: 25px; color: #a4b0be;">Bem-vindo! Insira seus dados para continuar.</p>
@@ -25,54 +24,66 @@
         </div>
     </div>
 
-    <div id="tela-pastas" class="oculto">
-        <header>
-            <div class="boas-vindas">Organização de <span>Lotes</span> 📦</div>
-            <button id="btn-sair" class="btn-sair">Sair</button>
+    <div id="tela-pastas" class="app-container oculto">
+        <header class="app-header">
+            <img src="imagens/logo.png" alt="Logo 50+ Saúde" class="logo-sistema">
+            <button id="btn-sair" class="btn-sair">Sair do Sistema</button>
         </header>
 
-        <div class="acoes-topo">
-            <button id="btn-abrir-modal" class="btn-principal">+ Criar Nova Pasta</button>
+        <div class="titulo-area">
+            <h1 class="boas-vindas">Gestão de <span>Lotes</span> e Cargas</h1>
+            <p class="subtitulo">Gerencie toda a operação de separação em um único painel ágil e seguro.</p>
         </div>
 
-        <h3 class="titulo-secao">📂 Pastas Abertas</h3>
-        <div class="grid-itens" id="lista-pastas">
+        <div class="acoes-topo">
+            <button id="btn-abrir-modal" class="btn-principal shadow-btn">+ Criar Nova Pasta</button>
+        </div>
+
+        <h3 class="titulo-secao">📂 Pastas Abertas na Operação</h3>
+        <div class="grid-itens" id="lista-pastas" style="margin-bottom: 50px;">
+            </div>
+
+        <h3 class="titulo-secao" style="color: #718096; border-color: #e2e8f0;">✅ Pastas Finalizadas</h3>
+        <div class="grid-itens" id="lista-pastas-finalizadas">
             </div>
     </div>
 
-    <div id="tela-bipagem" class="oculto">
-        <header style="align-items: flex-start;">
-            <div style="display: flex; gap: 10px;">
+    <div id="tela-bipagem" class="app-container oculto">
+        <header class="app-header" style="flex-wrap: wrap; gap: 15px;">
+            <img src="imagens/logo.png" alt="Logo 50+ Saúde" class="logo-sistema">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button id="btn-voltar" class="btn-secundario">⬅ Voltar</button>
-                <button id="btn-exportar" class="btn-principal" style="background-color: #10b981;">📄 Exportar (.TXT)</button>
-            </div>
-            <div class="info-pasta-header" style="text-align: right;">
-                <h2 id="titulo-pasta-atual" style="color: #2e3192; margin-bottom: 5px;">Nome da Pasta</h2>
-                <p id="info-pasta-atual" style="color: #666; font-size: 14px;">Notas: ... | Conferente: ...</p>
+                <button id="btn-exportar" class="btn-principal shadow-btn" style="background-color: #10b981;">📄 Exportar (.TXT)</button>
+                <button id="btn-finalizar" class="btn-principal shadow-btn" style="background-color: #3182ce;">🔒 Finalizar Pasta</button>
             </div>
         </header>
 
+        <div class="info-pasta-header">
+            <h2 id="titulo-pasta-atual" class="boas-vindas" style="font-size: 28px; text-align: left; margin-bottom: 5px;">Nome da Pasta</h2>
+            <p id="info-pasta-atual" class="subtitulo" style="text-align: left;">Notas: ... | Conferente: ...</p>
+        </div>
+
         <div class="progresso-container">
-            <h3 style="text-align: center; color: #4CAF50; margin-bottom: 10px;">
+            <h3 style="text-align: center; color: #2e5c40; margin-bottom: 5px;">
                 Volumes Bipados: <span id="contador-volumes">0</span> de <span id="total-volumes">0</span>
             </h3>
         </div>
 
         <div class="area-leitor">
             <form id="form-coletor">
-                <input type="text" id="input-codigo" placeholder="Passe o leitor aqui..." autocomplete="off">
-                <div class="status">🟢 Gravando na pasta atual</div>
+                <input type="text" id="input-codigo" placeholder="Passe o leitor de código de barras aqui..." autocomplete="off">
+                <div class="status">🟢 Sistema ativo e gravando em tempo real</div>
             </form>
         </div>
 
-        <h3 class="titulo-secao">Itens desta pasta (Ordem de leitura)</h3>
+        <h3 class="titulo-secao">Itens lidos nesta pasta</h3>
         <div class="grid-itens" id="lista-itens">
-            </div>
+        </div>
     </div>
 
     <div id="modal-nova-pasta" class="modal oculto">
         <div class="modal-content">
-            <h3 style="margin-bottom: 20px; color: #2e3192;">Criar Nova Pasta</h3>
+            <h3 style="margin-bottom: 20px; color: #1e3a28; font-size: 24px;">Criar Nova Pasta</h3>
             <form id="form-nova-pasta">
                 <label>Nome da Pasta (ex: Carga Sul):</label>
                 <input type="text" id="pasta-nome" class="input-modal" required>
@@ -98,11 +109,11 @@
     </div>
 
     <div id="modal-alerta" class="modal oculto" style="z-index: 9999;">
-        <div class="modal-content" style="text-align: center; max-width: 400px;">
+        <div class="modal-content" style="text-align: center; max-width: 420px; border-top: 6px solid #d97706;">
             <div id="alerta-icone" style="font-size: 60px; margin-bottom: 10px;">⚠️</div>
-            <h2 id="alerta-titulo" style="margin-bottom: 15px; font-size: 24px;">Atenção!</h2>
-            <p id="alerta-mensagem" style="color: #555; font-size: 16px; margin-bottom: 25px; line-height: 1.5;"></p>
-            <button id="btn-fechar-alerta" class="btn-principal" style="width: 100%; font-size: 18px;">Ciente, Continuar</button>
+            <h2 id="alerta-titulo" style="margin-bottom: 15px; font-size: 26px;">Atenção!</h2>
+            <p id="alerta-mensagem" style="color: #4a5568; font-size: 16px; margin-bottom: 25px; line-height: 1.6;"></p>
+            <button id="btn-fechar-alerta" class="btn-principal shadow-btn" style="width: 100%; font-size: 18px;">Ciente, Continuar</button>
         </div>
     </div>
 

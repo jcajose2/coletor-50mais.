@@ -1,174 +1,107 @@
-/* --- Tema Clean & Moderno --- */
+/* --- Tema SaaS Moderno --- */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; }
-body { background-color: #f8f9fa; color: #333; min-height: 100vh; display: flex; justify-content: center; padding: 40px 20px; }
+
+body { 
+    background: linear-gradient(to top, #1e3a28 0%, #356b4a 100%); 
+    min-height: 100vh; 
+    background-attachment: fixed; 
+    color: #333; 
+    display: flex; 
+    justify-content: center; 
+    padding: 40px 20px; 
+}
+
 .oculto { display: none !important; }
 
-/* =========================================
-   TELA DE LOGIN (NOVO LAYOUT DUPLO)
-========================================= */
-#tela-login {
-    display: flex; 
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 900px; 
-    overflow: hidden; 
-    align-self: center;
-    margin: auto; 
-}
+/* TELA DE LOGIN (DUPLO) */
+#tela-login { display: flex; background: white; border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); width: 100%; max-width: 900px; overflow: hidden; align-self: center; margin: auto; }
+.login-imagem { flex: 1; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; padding: 40px; }
+.login-imagem img { width: 100%; height: auto; max-width: 400px; object-fit: contain; }
+.login-form { flex: 1; background-color: #1e3a28; padding: 50px; display: flex; flex-direction: column; justify-content: center; color: white; }
+#tela-login h2 { color: #ffffff; margin-bottom: 15px; font-size: 32px; font-weight: 800; }
+.input-login { width: 100%; padding: 16px; margin-bottom: 20px; border: 2px solid #2e5c40; background-color: #2e5c40; border-radius: 12px; font-size: 16px; outline: none; transition: all 0.3s; color: white; }
+.input-login::placeholder { color: #a4b0be; }
+.input-login:focus { border-color: #4CAF50; background-color: #356b4a; }
+.btn-login { width: 100%; padding: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3); }
+.btn-login:hover { background-color: #45a049; transform: translateY(-3px); }
 
-.login-imagem {
-    flex: 1; 
-    background-color: #f0f2f5; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-}
-
-.login-imagem img {
-    width: 100%;
-    height: auto;
-    max-width: 400px; 
-    object-fit: contain;
-}
-
-.login-form {
-    flex: 1; 
-    background-color: #1e3a28; 
-    padding: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: white; 
-}
-
-#tela-login h2 {
-    color: #ffffff; 
-    margin-bottom: 15px;
-    font-size: 32px;
-    font-weight: 800;
-}
-
-.input-login {
-    width: 100%;
-    padding: 16px;
-    margin-bottom: 20px;
-    border: 2px solid #2e5c40; 
-    background-color: #2e5c40; 
-    border-radius: 10px;
-    font-size: 16px;
-    outline: none;
-    transition: all 0.3s;
-    color: white; 
-}
-.input-login::placeholder {
-    color: #a4b0be; 
-}
-.input-login:focus {
-    border-color: #4CAF50; 
-    background-color: #356b4a;
-}
-
-.btn-login {
-    width: 100%;
-    padding: 16px;
-    background-color: #4CAF50; 
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-}
-
-.btn-login:hover {
-    background-color: #45a049;
-    transform: translateY(-3px);
-}
-
-/* Responsividade do Login para Celulares */
 @media (max-width: 768px) {
-    #tela-login {
-        flex-direction: column; 
-        max-width: 450px;
-    }
-    .login-imagem {
-        padding: 30px 20px;
-        background-color: white; 
-    }
-    .login-imagem img {
-        max-width: 250px;
-    }
-    .login-form {
-        padding: 40px 30px;
-    }
-    #tela-login h2 { font-size: 26px; }
+    #tela-login { flex-direction: column; max-width: 450px; }
+    .login-imagem { padding: 30px 20px; background-color: white; }
+    .login-imagem img { max-width: 200px; }
+    .login-form { padding: 40px 30px; }
 }
 
-/* =========================================
-   TELAS APP (Pastas e Bipagem) 
-========================================= */
-#tela-pastas, #tela-bipagem { width: 100%; max-width: 900px; }
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-.boas-vindas { font-size: 32px; font-weight: bold; color: #1a1a1a; }
-.boas-vindas span { color: #4CAF50; }
-.acoes-topo { margin-bottom: 30px; display: flex; justify-content: flex-end; }
+/* DASHBOARD DO SISTEMA */
+.app-container { background: #ffffff; width: 100%; max-width: 1100px; border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); padding: 40px 50px; margin: auto; align-self: flex-start; }
+.app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; padding-bottom: 20px; margin-bottom: 30px; }
+.logo-sistema { height: 80px; transform: scale(1.8); transform-origin: left center; margin-left: 10px; }
 
-/* Botões Globais */
-.btn-principal { background-color: #2e3192; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-.btn-principal:hover { background-color: #1e2060; }
-.btn-secundario { background: transparent; border: 2px solid #ccc; color: #555; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-.btn-secundario:hover { border-color: #999; color: #333; }
-.btn-sair { background: none; border: 1px solid #dc3545; color: #dc3545; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s;}
-.btn-sair:hover { background: #dc3545; color: white; }
+.titulo-area { text-align: center; margin-bottom: 40px; }
+.boas-vindas { font-size: 40px; font-weight: 800; color: #1a202c; letter-spacing: -0.5px; }
+.boas-vindas span { color: #4CAF50; }
+.subtitulo { color: #718096; font-size: 18px; margin-top: 10px; }
+.acoes-topo { display: flex; justify-content: flex-end; margin-bottom: 30px; }
+
+/* Botões Modernizados */
+.btn-principal { background-color: #4CAF50; color: white; border: none; padding: 14px 24px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.btn-principal:hover { background-color: #388E3C; transform: translateY(-2px); }
+.shadow-btn { box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); } 
+.btn-secundario { background: transparent; border: 2px solid #cbd5e0; color: #4a5568; padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.btn-secundario:hover { border-color: #a0aec0; color: #2d3748; background-color: #f7fafc; }
+.btn-sair { background: #fff5f5; border: 1px solid #fed7d7; color: #e53e3e; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+.btn-sair:hover { background: #e53e3e; color: white; border-color: #e53e3e; }
 
 /* Modal (Popup) */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-.modal-content { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
-.modal-content label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; font-size: 14px; }
-.input-modal { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; outline: none; }
-.input-modal:focus { border-color: #2e3192; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
+.modal-content { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+.modal-content label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 14px; }
+.input-modal { width: 100%; padding: 14px; margin-bottom: 20px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; color: #2d3748; }
+.input-modal:focus { border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.1); }
 
-/* Área do Leitor e Progresso */
-.progresso-container { background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #c8e6c9; }
-.area-leitor { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); margin-bottom: 40px; border-top: 5px solid #4CAF50; }
-.area-leitor input { width: 100%; padding: 20px; font-size: 20px; border: 2px solid #e0e0e0; border-radius: 10px; outline: none; transition: all 0.3s; text-align: center; }
-.area-leitor input:focus { border-color: #4CAF50; box-shadow: 0 0 10px rgba(76, 175, 80, 0.2); }
-.status { text-align: center; margin-top: 10px; font-size: 14px; color: #666; }
+/* Área do Leitor */
+.progresso-container { background: #f0fdf4; padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #bbf7d0; }
+.area-leitor { background: #f8fafc; padding: 35px; border-radius: 16px; margin-bottom: 40px; border: 1px solid #e2e8f0; }
+.area-leitor input { width: 100%; padding: 22px; font-size: 22px; border: 2px solid #cbd5e0; border-radius: 12px; outline: none; transition: all 0.3s; text-align: center; color: #1a202c; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+.area-leitor input:focus { border-color: #4CAF50; box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.15); }
+.area-leitor input:disabled { background-color: #edf2f7; cursor: not-allowed; border-color: #cbd5e0; color: #a0aec0; }
+.status { text-align: center; margin-top: 15px; font-size: 14px; color: #718096; font-weight: 500; }
 
-/* Grid de Cartões (Pastas e Itens) */
-.titulo-secao { font-size: 20px; color: #444; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-.grid-itens { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+/* Grade de Cartões */
+.titulo-secao { font-size: 22px; color: #2d3748; margin-bottom: 20px; border-bottom: 2px solid #edf2f7; padding-bottom: 12px; font-weight: 700; }
+.grid-itens { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
 
-/* Cartão */
-.card-item { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; display: flex; flex-direction: column; justify-content: space-between; transition: 0.2s; position: relative; cursor: pointer; }
-.card-item:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-color: #2e3192; }
-.card-pasta { border-left: 5px solid #2e3192; }
-.card-bipagem { border-left: 5px solid #4CAF50; flex-direction: row; align-items: center; cursor: default;}
+/* Cartão Padrão */
+.card-item { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; cursor: pointer; }
+.card-item:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: #4CAF50; }
 
-.info-card .codigo { 
-    font-family: monospace; font-size: 16px; font-weight: bold; color: #2e3192; 
-    display: block; margin-bottom: 8px; 
-    word-break: break-all; 
-    overflow-wrap: anywhere;
+.card-pasta { border-left: 6px solid #4CAF50; }
+.card-bipagem { border-left: 6px solid #a0aec0; flex-direction: row; align-items: center; cursor: default;}
+
+/* ESTILO NOVO: CARTÃO FINALIZADO */
+.card-finalizada { border-left: 6px solid #cbd5e0; background-color: #f7fafc; opacity: 0.85; }
+.card-finalizada .codigo { color: #718096; text-decoration: line-through; }
+.card-finalizada:hover { border-color: #cbd5e0; transform: none; box-shadow: 0 4px 6px rgba(0,0,0,0.02); cursor: pointer;}
+
+.info-card .codigo { font-family: 'Courier New', monospace; font-size: 18px; font-weight: 800; color: #1e3a28; display: block; margin-bottom: 10px; word-break: break-all; overflow-wrap: anywhere; }
+.info-card .data { font-size: 14px; color: #718096; margin-bottom: 6px; display: block; font-weight: 500;}
+.info-card .destaque { color: #d97706; font-weight: 800; }
+
+/* Botão Apagar do Cartão */
+.btn-apagar { background: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; font-size: 16px; }
+.btn-apagar:hover { background: #e53e3e; color: white; border-color: #e53e3e; }
+
+/* Cores de Alerta para Validade (GS1) */
+.card-vencido { border-left: 6px solid #e53e3e !important; background-color: #fff5f5 !important; border-color: #fed7d7 !important; }
+.card-vencido .codigo { color: #c53030 !important; }
+.card-vence-ano { border-left: 6px solid #d97706 !important; background-color: #fffaf0 !important; border-color: #feebc8 !important; }
+.card-vence-ano .codigo { color: #b7791f !important; }
+
+/* Responsividade do App */
+@media (max-width: 768px) {
+    body { padding: 15px; }
+    .app-container { padding: 25px 20px; border-radius: 16px; }
+    .boas-vindas { font-size: 28px; }
+    .logo-sistema { height: 45px; transform: scale(1.4); }
+    .grid-itens { grid-template-columns: 1fr; }
 }
-.info-card .data { font-size: 13px; color: #888; margin-bottom: 4px; display: block;}
-.info-card .destaque { color: #d97706; font-weight: bold; }
-
-.btn-apagar { background: #fee2e2; color: #ef4444; border: none; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-.btn-apagar:hover { background: #ef4444; color: white; }
-
-/* =========================================
-   Cores de Alerta para Validade (GS1)
-========================================= */
-/* PRODUTO VENCIDO (Vermelho) */
-.card-vencido { border-left: 6px solid #dc3545 !important; background-color: #fff5f5 !important; }
-.card-vencido .codigo { color: #dc3545 !important; }
-
-/* VENCE ESTE ANO (Laranja) */
-.card-vence-ano { border-left: 6px solid #f59e0b !important; background-color: #fffbeb !important; }
-.card-vence-ano .codigo { color: #d97706 !important; }
