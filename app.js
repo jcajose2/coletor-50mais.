@@ -37,7 +37,7 @@ const mensagemAlerta = document.getElementById('alerta-mensagem');
 
 function mostrarAlerta(titulo, mensagem, tipo) {
     tituloAlerta.innerText = titulo;
-    mensagemAlerta.innerHTML = mensagem; // Permite quebra de linha <br>
+    mensagemAlerta.innerHTML = mensagem; 
     
     if (tipo === 'erro') {
         iconeAlerta.innerText = '❌';
@@ -51,7 +51,6 @@ function mostrarAlerta(titulo, mensagem, tipo) {
     modalAlerta.classList.remove('oculto');
 }
 
-// Fechar o alerta e voltar o foco pro leitor
 document.getElementById('btn-fechar-alerta').addEventListener('click', () => {
     modalAlerta.classList.add('oculto');
     document.getElementById('input-codigo').focus();
@@ -194,12 +193,26 @@ function abrirPasta(id, nome, nfs, usuario, volumesTotal) {
             const idBip = docBip.id;
             bipagensAtuais.push(item.fullCode);
 
+            // === APLICA AS CORES SALVAS NO BANCO ===
+            let classeCorCSS = '';
+            let iconeStatus = '✅';
+
+            if (item.statusValidade === 'vencido') {
+                classeCorCSS = 'card-vencido';
+                iconeStatus = '🚨';
+            } else if (item.statusValidade === 'vence_este_ano') {
+                classeCorCSS = 'card-vence-ano';
+                iconeStatus = '⚠️';
+            }
+
             const card = document.createElement('div');
-            card.className = 'card-item card-bipagem';
+            // Junta a classe padrão com a classe de cor
+            card.className = `card-item card-bipagem ${classeCorCSS}`; 
+            
             card.innerHTML = `
                 <div class="info-card" style="flex: 1;">
-                    <span class="codigo">${item.fullCode}</span>
-                    <span class="data">⏰ ${item.hora}</span>
+                    <span class="codigo">${iconeStatus} ${item.fullCode}</span>
+                    <span class="data">⏰ Lançado às: ${item.hora}</span>
                 </div>
                 <button class="btn-apagar" onclick="apagarBipagem('${idBip}')">X</button>
             `;
@@ -231,7 +244,7 @@ document.getElementById('btn-voltar').addEventListener('click', () => {
     telaPastas.classList.remove('oculto');
 });
 
-// --- LÓGICA DE BIPAR (COM BLOQUEIO DE CÓDIGO E AVISO DE VALIDADE) ---
+// --- LÓGICA DE BIPAR E TESTE DE VALIDADE GS1-128 ---
 document.getElementById('form-coletor').addEventListener('submit', async (e) => {
     e.preventDefault();
     const inputCodigo = document.getElementById('input-codigo');
@@ -239,52 +252,72 @@ document.getElementById('form-coletor').addEventListener('submit', async (e) => 
     
     if (codigoLimpo === '' || !pastaAtualId) return;
 
-    // =========================================================
-    // 🚫 1. BLOQUEIO DE CÓDIGO ERRADO (EAN DE CAIXA MENOR)
-    // Se for menor que 15 caracteres, com certeza é o código errado.
-    // =========================================================
+    // 1. BLOQUEIO DE EAN CURTO
     if (codigoLimpo.length <= 14) {
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]); 
-        mostrarAlerta(
-            "Código Incorreto!",
-            "Você bipou o código menor da embalagem (EAN).<br><br><b>Por favor, procure e bipe o código maior (Datamatrix/GS1) que contém o lote e a validade.</b>",
-            "erro"
-        );
-        inputCodigo.value = ''; // Limpa
-        return; // 🛑 PARA AQUI! O código não será salvo.
+        mostrarAlerta("Código Incorreto!", "Você bipou o código menor da embalagem (EAN).<br><br><b>Bipe o código maior que contém lote e validade.</b>", "erro");
+        inputCodigo.value = ''; 
+        return; 
     }
 
-    // =========================================================
-    // ⚠️ 2. AVISO DE VALIDADE (Manteve o código, mas mudou pro Alerta Bonitão)
-    // =========================================================
+    // Variável para guardar o status que vai pro banco de dados
+    let statusDaBipagem = 'ok';
+
+    // 2. LEITURA EXATA DE DATA GS1-128
     if (codigoLimpo.startsWith("01") && codigoLimpo.length >= 24) {
         const identificadorData = codigoLimpo.substring(16, 18);
+        
         if (identificadorData === "17") {
+            // Separa os números (Ano, Mês e Dia do código)
             const anoVencimento = codigoLimpo.substring(18, 20); 
-            const anoAtual = new Date().getFullYear().toString().substring(2, 4);
+            const mesVencimento = codigoLimpo.substring(20, 22);
+            const diaVencimento = codigoLimpo.substring(22, 24);
+            
+            // Cria um "Texto" da data do código (Ex: "280722")
+            const dataCodigoStr = anoVencimento + mesVencimento + diaVencimento;
 
-            if (anoVencimento === anoAtual) {
+            // Pega a data exata de HOJE e cria um texto igual (Ex: "260213" para 13 de Fev de 2026)
+            const hoje = new Date();
+            const anoAtual = hoje.getFullYear().toString().substring(2, 4);
+            const mesAtual = String(hoje.getMonth() + 1).padStart(2, '0');
+            const diaAtual = String(hoje.getDate()).padStart(2, '0');
+            const dataHojeStr = anoAtual + mesAtual + diaAtual;
+
+            // === A GRANDE MÁGICA DA COMPARAÇÃO ===
+            
+            // 1º TESTE: Já passou da data? (Vencido)
+            if (dataCodigoStr < dataHojeStr) {
+                if (navigator.vibrate) navigator.vibrate([800, 300, 800, 300, 800]); 
+                mostrarAlerta(
+                    "🚨 PRODUTO VENCIDO! 🚨",
+                    `A validade desta caixa expirou no dia <b>${diaVencimento}/${mesVencimento}/20${anoVencimento}</b>!<br><br><b>O código ficará marcado em VERMELHO. Separe este produto imediatamente!</b>`,
+                    "erro"
+                );
+                statusDaBipagem = 'vencido';
+            } 
+            // 2º TESTE: Vence este ano? (Atenção)
+            else if (anoVencimento === anoAtual) {
                 if (navigator.vibrate) navigator.vibrate([500, 200, 500]); 
                 mostrarAlerta(
-                    "Cuidado com a Validade!",
-                    `Este produto VENCE NESTE ANO (20${anoVencimento})!<br><br><b>O código foi salvo na lista</b>, mas verifique o lote fisicamente para garantir que pode ser enviado.`,
+                    "⚠️ Cuidado com a Validade!",
+                    `Este produto VENCE NESTE ANO (<b>${diaVencimento}/${mesVencimento}/20${anoVencimento}</b>)!<br><br>O código ficará marcado em <b>Laranja</b> para conferência.`,
                     "aviso"
                 );
+                statusDaBipagem = 'vence_este_ano';
             }
         }
     }
 
-    // =========================================================
-    // ✅ 3. SALVAR NO BANCO DE DADOS
-    // =========================================================
+    // 3. SALVAR NO BANCO DE DADOS (Junto com o status da cor!)
     try {
         await addDoc(collection(db, 'pastas', pastaAtualId, 'bipagens'), {
             fullCode: codigoLimpo,
             hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            timestamp: new Date().getTime()
+            timestamp: new Date().getTime(),
+            statusValidade: statusDaBipagem // <--- Isso grava a cor para sempre!
         });
         inputCodigo.value = '';
-        inputCodigo.focus(); // Se não teve alerta, já foca pro próximo bipe
+        inputCodigo.focus(); 
     } catch (erro) {
         mostrarAlerta("Falha de Conexão", "Erro ao salvar! Verifique sua internet.", "erro");
     }
@@ -297,7 +330,6 @@ window.apagarBipagem = async (idBipagem) => {
     }
 };
 
-// Mantém o foco no leitor, desde que os modais não estejam abertos
 setInterval(() => {
     if (!telaBipagem.classList.contains('oculto') && 
         modalNovaPasta.classList.contains('oculto') &&
