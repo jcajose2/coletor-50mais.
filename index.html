@@ -8,14 +8,21 @@
 </head>
 <body>
 
-    <div id="tela-login">
-        <h2>Acesso 50+ Saúde</h2>
-        <form id="form-login">
-            <input type="email" id="email" class="input-login" placeholder="E-mail" required>
-            <input type="password" id="senha" class="input-login" placeholder="Senha" required>
-            <button type="submit" class="btn-login">Entrar</button>
-        </form>
-        <p id="erro-login" style="color: red; margin-top: 10px; font-size: 14px; display: none;">Login ou senha incorretos!</p>
+    <div id="tela-login" class="login-container">
+        <div class="login-imagem">
+            <img src="imagens/logo-login.png" alt="Ilustração de Logística 50+">
+        </div>
+
+        <div class="login-form">
+            <h2>Acesso 50+ Saúde</h2>
+            <p style="margin-bottom: 25px; color: #a4b0be;">Bem-vindo! Insira seus dados para continuar.</p>
+            <form id="form-login">
+                <input type="email" id="email" class="input-login" placeholder="E-mail" required>
+                <input type="password" id="senha" class="input-login" placeholder="Senha" required>
+                <button type="submit" class="btn-login">Entrar no Sistema</button>
+            </form>
+            <p id="erro-login" style="color: #ff6b6b; margin-top: 15px; font-size: 14px; display: none; background: #3d2222; padding: 10px; border-radius: 6px;">Login ou senha incorretos!</p>
+        </div>
     </div>
 
     <div id="tela-pastas" class="oculto">

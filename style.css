@@ -3,15 +3,115 @@
 body { background-color: #f8f9fa; color: #333; min-height: 100vh; display: flex; justify-content: center; padding: 40px 20px; }
 .oculto { display: none !important; }
 
-/* TELA DE LOGIN */
-#tela-login { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: center; align-self: center; }
-#tela-login h2 { color: #2e3192; margin-bottom: 20px; font-size: 24px; }
-.input-login { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: border 0.3s; }
-.input-login:focus { border-color: #4CAF50; }
-.btn-login { width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-.btn-login:hover { background-color: #45a049; }
+/* =========================================
+   TELA DE LOGIN (NOVO LAYOUT DUPLO)
+========================================= */
+#tela-login {
+    display: flex; 
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 900px; 
+    overflow: hidden; 
+    align-self: center;
+    margin: auto; 
+}
 
-/* TELAS APP (Pastas e Bipagem) */
+.login-imagem {
+    flex: 1; 
+    background-color: #f0f2f5; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.login-imagem img {
+    width: 100%;
+    height: auto;
+    max-width: 400px; 
+    object-fit: contain;
+}
+
+.login-form {
+    flex: 1; 
+    background-color: #1e3a28; 
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white; 
+}
+
+#tela-login h2 {
+    color: #ffffff; 
+    margin-bottom: 15px;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.input-login {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 2px solid #2e5c40; 
+    background-color: #2e5c40; 
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s;
+    color: white; 
+}
+.input-login::placeholder {
+    color: #a4b0be; 
+}
+.input-login:focus {
+    border-color: #4CAF50; 
+    background-color: #356b4a;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 16px;
+    background-color: #4CAF50; 
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-login:hover {
+    background-color: #45a049;
+    transform: translateY(-3px);
+}
+
+/* Responsividade do Login para Celulares */
+@media (max-width: 768px) {
+    #tela-login {
+        flex-direction: column; 
+        max-width: 450px;
+    }
+    .login-imagem {
+        padding: 30px 20px;
+        background-color: white; 
+    }
+    .login-imagem img {
+        max-width: 250px;
+    }
+    .login-form {
+        padding: 40px 30px;
+    }
+    #tela-login h2 { font-size: 26px; }
+}
+
+/* =========================================
+   TELAS APP (Pastas e Bipagem) 
+========================================= */
 #tela-pastas, #tela-bipagem { width: 100%; max-width: 900px; }
 header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
 .boas-vindas { font-size: 32px; font-weight: bold; color: #1a1a1a; }
@@ -53,7 +153,6 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 .info-card .codigo { 
     font-family: monospace; font-size: 16px; font-weight: bold; color: #2e3192; 
     display: block; margin-bottom: 8px; 
-    /* ISSO AQUI RESOLVE O ERRO DA SUA FOTO: */
     word-break: break-all; 
     overflow-wrap: anywhere;
 }
@@ -62,20 +161,14 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 
 .btn-apagar { background: #fee2e2; color: #ef4444; border: none; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
 .btn-apagar:hover { background: #ef4444; color: white; }
+
 /* =========================================
    Cores de Alerta para Validade (GS1)
 ========================================= */
-
 /* PRODUTO VENCIDO (Vermelho) */
-.card-vencido {
-    border-left: 6px solid #dc3545 !important;
-    background-color: #fff5f5 !important;
-}
+.card-vencido { border-left: 6px solid #dc3545 !important; background-color: #fff5f5 !important; }
 .card-vencido .codigo { color: #dc3545 !important; }
 
 /* VENCE ESTE ANO (Laranja) */
-.card-vence-ano {
-    border-left: 6px solid #f59e0b !important;
-    background-color: #fffbeb !important;
-}
+.card-vence-ano { border-left: 6px solid #f59e0b !important; background-color: #fffbeb !important; }
 .card-vence-ano .codigo { color: #d97706 !important; }
