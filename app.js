@@ -342,7 +342,7 @@ document.getElementById('form-coletor').addEventListener('submit', async (e) => 
     // 1. CAPTURA O CÓDIGO
     const codigoLimpo = inputCodigo.value.trim();
     
-    // 2. LIMPA O CAMPO IMEDIATAMENTE (O pulo do gato 🐱)
+    // 2. LIMPA O CAMPO IMEDIATAMENTE
     // Assim não existe risco de bipar em cima do código antigo
     inputCodigo.value = '';
     
@@ -449,4 +449,5 @@ setInterval(() => {
         const inputCodigo = document.getElementById('input-codigo');
         if(document.activeElement !== inputCodigo && !inputCodigo.disabled) inputCodigo.focus();
     }
+
 }, 3000);
