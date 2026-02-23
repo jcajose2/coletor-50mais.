@@ -19,6 +19,7 @@ const auth = getAuth(app);
 // Variáveis Globais de Estado
 let pastaAtualId = null; 
 let nomePastaAtual = ""; 
+let notasPastaAtual = ""; // <-- ADICIONADO: Guarda as NFs para usar na exportação
 let totalVolumesPastaAtual = 0;
 let statusPastaAtual = "aberta"; 
 let bipagensAtuais = []; 
@@ -217,6 +218,7 @@ onSnapshot(query(collection(db, 'pastas'), orderBy('timestamp', 'desc')), (snaps
 function abrirPasta(id, nome, nfs, usuario, volumesTotal, status) {
     pastaAtualId = id;
     nomePastaAtual = nome;
+    notasPastaAtual = nfs; // <-- ADICIONADO: Salva as notas ao abrir a pasta
     totalVolumesPastaAtual = volumesTotal;
     statusPastaAtual = status;
 
@@ -312,6 +314,7 @@ document.getElementById('btn-finalizar').addEventListener('click', async () => {
     }
 });
 
+// --- LÓGICA DE EXPORTAÇÃO (ATUALIZADA) ---
 document.getElementById('btn-exportar').addEventListener('click', () => {
     if (bipagensAtuais.length === 0) {
         mostrarAlerta("Erro ao Exportar", "A pasta está vazia! Não há códigos para baixar.", "erro");
@@ -321,7 +324,13 @@ document.getElementById('btn-exportar').addEventListener('click', () => {
     const blob = new Blob([conteudoTXT], { type: 'text/plain;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `Bipagens_${nomePastaAtual.replace(/\s+/g, '_')}.txt`; 
+    
+    // <-- ADICIONADO: Lógica para formatar o nome do arquivo com a Nota Fiscal
+    // Substitui vírgulas e espaços por "underline" para o Windows aceitar o arquivo
+    let nfsLimpas = notasPastaAtual.replace(/,\s*/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+    let nomeDoArquivo = nfsLimpas ? `Notas_${nfsLimpas}.txt` : `Bipagens_${nomePastaAtual.replace(/\s+/g, '_')}.txt`;
+
+    link.download = nomeDoArquivo; 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
