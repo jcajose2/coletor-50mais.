@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// --- SUA CONFIGURAÇÃO ---
+// --- congf banco ---
 const firebaseConfig = {
     apiKey: "AIzaSyC-SDsCnnIHzgDehBZ-8hjNkwLdPF3Hxyg", 
     authDomain: "coletor-50mais.firebaseapp.com",
@@ -19,7 +19,7 @@ const auth = getAuth(app);
 // Variáveis Globais de Estado
 let pastaAtualId = null; 
 let nomePastaAtual = ""; 
-let notasPastaAtual = ""; // <-- ADICIONADO: Guarda as NFs para usar na exportação
+let notasPastaAtual = "";
 let totalVolumesPastaAtual = 0;
 let statusPastaAtual = "aberta"; 
 let bipagensAtuais = []; 
@@ -35,7 +35,7 @@ const iconeAlerta = document.getElementById('alerta-icone');
 const tituloAlerta = document.getElementById('alerta-titulo');
 const mensagemAlerta = document.getElementById('alerta-mensagem');
 
-// --- MOTOR DE SOM TURBO ---
+// --- Som para viso---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function tocarSom(tipo) {
@@ -61,12 +61,12 @@ function tocarSom(tipo) {
     };
 
     if (tipo === 'atencao') {
-        // SOM "PLIM-PLIM"
+        // SOM 
         criarOscilador(800, 'square', tempoAtual, 0.1);
         criarOscilador(1200, 'square', tempoAtual + 0.15, 0.2);
     } 
     else if (tipo === 'erro') {
-        // SOM "BUZZER" PESADO
+        // SOM 
         criarOscilador(150, 'sawtooth', tempoAtual, 0.4); 
         criarOscilador(170, 'sawtooth', tempoAtual, 0.4); 
         criarOscilador(200, 'square', tempoAtual, 0.4); 
@@ -74,7 +74,7 @@ function tocarSom(tipo) {
 }
 
 
-// --- SISTEMA DE ALERTA ---
+// --- Alerta ---
 function mostrarAlerta(titulo, mensagem, tipo) {
     tituloAlerta.innerText = titulo;
     mensagemAlerta.innerHTML = mensagem; 
@@ -98,7 +98,7 @@ document.getElementById('btn-fechar-alerta').addEventListener('click', () => {
     // Só destrava o input se a pasta estiver aberta
     if(statusPastaAtual === "aberta") {
         const input = document.getElementById('input-codigo');
-        input.disabled = false; // Destrava
+        input.disabled = false;
         input.focus();
     }
 });
@@ -218,7 +218,7 @@ onSnapshot(query(collection(db, 'pastas'), orderBy('timestamp', 'desc')), (snaps
 function abrirPasta(id, nome, nfs, usuario, volumesTotal, status) {
     pastaAtualId = id;
     nomePastaAtual = nome;
-    notasPastaAtual = nfs; // <-- ADICIONADO: Salva as notas ao abrir a pasta
+    notasPastaAtual = nfs; 
     totalVolumesPastaAtual = volumesTotal;
     statusPastaAtual = status;
 
@@ -314,7 +314,7 @@ document.getElementById('btn-finalizar').addEventListener('click', async () => {
     }
 });
 
-// --- LÓGICA DE EXPORTAÇÃO (ATUALIZADA) ---
+// --- EXPORTAÇÃO FORMATU BLOCO ---
 document.getElementById('btn-exportar').addEventListener('click', () => {
     if (bipagensAtuais.length === 0) {
         mostrarAlerta("Erro ao Exportar", "A pasta está vazia! Não há códigos para baixar.", "erro");
@@ -325,8 +325,8 @@ document.getElementById('btn-exportar').addEventListener('click', () => {
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     
-    // <-- ADICIONADO: Lógica para formatar o nome do arquivo com a Nota Fiscal
-    // Substitui vírgulas e espaços por "underline" para o Windows aceitar o arquivo
+    // <-- Lógica para formatar o nome do arquivo com a Nota Fiscal
+    // Substitui vírgulas e espaços por "underline" se não o Windows não aceita o arquivo
     let nfsLimpas = notasPastaAtual.replace(/,\s*/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
     let nomeDoArquivo = nfsLimpas ? `Notas_${nfsLimpas}.txt` : `Bipagens_${nomePastaAtual.replace(/\s+/g, '_')}.txt`;
 
@@ -343,7 +343,7 @@ document.getElementById('btn-voltar').addEventListener('click', () => {
     telaPastas.classList.remove('oculto');
 });
 
-// --- LÓGICA DE BIPAR (COM LIMPEZA IMEDIATA) ---
+// --- BIPAR ---
 document.getElementById('form-coletor').addEventListener('submit', async (e) => {
     e.preventDefault();
     const inputCodigo = document.getElementById('input-codigo');
@@ -351,7 +351,7 @@ document.getElementById('form-coletor').addEventListener('submit', async (e) => 
     // 1. CAPTURA O CÓDIGO
     const codigoLimpo = inputCodigo.value.trim();
     
-    // 2. LIMPA O CAMPO IMEDIATAMENTE
+    // LIMPA O CAMPO
     // Assim não existe risco de bipar em cima do código antigo
     inputCodigo.value = '';
     
@@ -373,13 +373,13 @@ document.getElementById('form-coletor').addEventListener('submit', async (e) => 
 
     let statusDaBipagem = 'ok';
 
-    // 0.1 BIPAGEM DUPLA (Maior que 50)
+    // EVITA A BIPAGEM DUPLA (Maior que 50)
     if (codigoLimpo.length > 50) {
         if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100]); 
         mostrarAlerta("Bipagem Dupla!", "O sistema registrou <b>dois códigos</b> juntos.<br>O item foi salvo, mas confira a contagem.", "aviso"); 
     }
 
-    // 0.2 BLOQUEIO DE QR CODE DE SITE
+    // BLOQUEIO DE QR CODE DE SITE
     const textoMinusculo = codigoLimpo.toLowerCase();
     if (textoMinusculo.includes('http://') || textoMinusculo.includes('https://') || textoMinusculo.includes('www.')) {
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]); 
@@ -387,14 +387,14 @@ document.getElementById('form-coletor').addEventListener('submit', async (e) => 
         return; 
     }
 
-    // 1. BLOQUEIO DE CÓDIGO CURTO
+    // BLOQUEIO DE CÓDIGO CURTO
     if (codigoLimpo.length <= 14) {
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]); 
         mostrarAlerta("Código Incorreto!", "Código EAN curto.<br>Bipe o código GS1 (Longo). NÃO FOI SALVO.", "erro");
         return; 
     }
 
-    // 2. LEITURA DE DATA GS1-128
+    // LEITURA DE DATA GS1-128
     if (codigoLimpo.startsWith("01") && codigoLimpo.length >= 24) {
         const identificadorData = codigoLimpo.substring(16, 18);
         
@@ -460,3 +460,4 @@ setInterval(() => {
     }
 
 }, 3000);
+
